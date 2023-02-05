@@ -274,8 +274,9 @@ function createUI() {
     game && (lastTheme = game.options.menu.darkTheme.enabled);
   }
 
-  MODULES.graphs.themeChanged();
   document.querySelector("#blackCB").checked = GRAPHSETTINGS.darkTheme;
+  MODULES.graphs.themeChanged();
+
   document.querySelector("#portalCountTextBox").value = GRAPHSETTINGS.portalsDisplayed;
 }
 
@@ -293,28 +294,22 @@ function toggleClearButton() {
 }
 
 function toggleDarkGraphs() {
-  function removeDarkGraphs() {
-    var darkcss = document.getElementById("dark-graph.css");
-    darkcss && (document.head.removeChild(darkcss), debug("Removing dark-graph.css file", "graphs"));
-  }
-  function addDarkGraphs() {
-    var darkcss = document.getElementById("dark-graph.css");
-    if (!darkcss) {
-      var b = document.createElement("link");
-      (b.rel = "stylesheet"), (b.type = "text/css"), (b.id = "dark-graph.css"), (b.href = basepath + "dark-graph.css"), document.head.appendChild(b), debug("Adding dark-graph.css file", "graphs");
-    }
-  }
   if (game) {
     var darkcss = document.getElementById("dark-graph.css")
     var dark = document.getElementById("blackCB").checked;
-    saveSetting("darkTheme", !dark)
-    if ((!darkcss && (0 == game.options.menu.darkTheme.enabled || 2 == game.options.menu.darkTheme.enabled)) || MODULES.graphs.useDarkAlways || dark) {
-      addDarkGraphs()
+    saveSetting("darkTheme", dark)
+    if (!darkcss && dark) {
+      var b = document.createElement("link");
+      b.rel = "stylesheet";
+      b.type = "text/css";
+      b.id = "dark-graph.css";
+      b.href = basepath + "dark-graph.css";
+      document.head.appendChild(b);
+      debug("Adding dark-graph.css file", "graphs");
     }
-    else {
-      if (darkcss && (1 == game.options.menu.darkTheme.enabled || 3 == game.options.menu.darkTheme.enabled || !dark)) {
-        removeDarkGraphs();
-      }
+    else if (darkcss && !dark) {
+      document.head.removeChild(darkcss)
+      debug("Removing dark-graph.css file", "graphs")
     }
   }
 }
