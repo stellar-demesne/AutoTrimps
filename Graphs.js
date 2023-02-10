@@ -206,7 +206,7 @@ function createUI() {
       opt.text = textMod + item;
       selector.appendChild(opt);
     }
-    selector.value = GRAPHSETTINGS[selector.id]
+    //selector.value = GRAPHSETTINGS[selector.id]
     return selector;
   }
 
@@ -232,9 +232,10 @@ function createUI() {
     <div style="float:right; margin-right: 1vw;"><button onclick="toggleAllGraphs()">All Off/On</button></div>`
 
   // AAAAAAAAAAAAAAAAAAAAAAAAAAAA (Setting the inner HTML of the parent element resets the value of these? what the fuck)
-  document.querySelector("#universeSelection").value = GRAPHSETTINGS.universeSelection
-  document.querySelector("#u1graphSelection").value = GRAPHSETTINGS.u1graphSelection
-  document.querySelector("#u2graphSelection").value = GRAPHSETTINGS.u2graphSelection
+  // default to Current Universe + Clear Time if no user data exists
+  document.querySelector("#universeSelection").value = GRAPHSETTINGS.universeSelection || "Universe " + getGameData.universe();
+  document.querySelector("#u1graphSelection").value = GRAPHSETTINGS.u1graphSelection || "Clear Time";
+  document.querySelector("#u2graphSelection").value = GRAPHSETTINGS.u2graphSelection || "Clear Time";
 
   let tipsText = "You can zoom by dragging a box around an area. You can turn portals off by clicking them on the legend. Quickly view the last portal by clicking it off, then Invert Selection. Or by clicking All Off, then clicking the portal on. To delete a portal, Type its portal number in the box and press Delete Specific. Using negative numbers in the Delete Specific box will KEEP that many portals (starting counting backwards from the current one), ie: if you have Portals 1000-1015, typing -10 will keep 1005-1015."
   document.getElementById("graphFooterLine2").innerHTML += `
@@ -253,7 +254,7 @@ function createUI() {
   document.querySelector("#graphParent").appendChild(toggleDiv);
 
 
-  // Handle Dark Graphs?  Old code
+  // Adjust UI elements for Trimps Theme changes
   MODULES.graphs.themeChanged = function () {
     if (game && game.options.menu.darkTheme.enabled != lastTheme) {
       function f(h) {
