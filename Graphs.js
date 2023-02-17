@@ -113,6 +113,8 @@ function clearData(keepN, clrall = false) {
   }
   else { // keep keepN portals, delete the rest
     let keep = Object.keys(portalSaveData).splice(Object.keys(portalSaveData).length - keepN);
+    debug(`Existing Portals (${Object.keys(portalSaveData).length}): ${Object.keys(portalSaveData)}`)
+    debug(`Keeping ${keepN}: ${keep}`)
     for (const portalID of Object.keys(portalSaveData)) {
       if (!keep.includes(portalID)) {
         delete portalSaveData[portalID];
@@ -122,6 +124,7 @@ function clearData(keepN, clrall = false) {
     }
   }
   if (changed) {
+    debug("Saving Portal Data after deletions")
     savePortalData(true)
     showHideUnusedGraphs();
   }
@@ -752,9 +755,9 @@ function pushData(fromMap) {
   if (!portalSaveData[portalID] || getGameData.world() === 1) { // reset portal data if restarting a portal
     savePortalData(true) // save old portal to history
     portalSaveData[portalID] = new Portal();
+    clearData(GRAPHSETTINGS.maxGraphs); // clear out old portals
   }
   portalSaveData[portalID].update(fromMap);
-  clearData(GRAPHSETTINGS.maxGraphs);
   savePortalData(false) // save current portal
   if (GRAPHSETTINGS.live && GRAPHSETTINGS.open) {
     updateGraph();
