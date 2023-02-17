@@ -93,7 +93,7 @@ function loadGraphData() {
     }
   }
   GRAPHSETTINGS.open = false;
-  GRAPHSETTINGS.maxGraphs = 60 // override everyone's settings because they can't set this value anywhere whoops
+  if (GRAPHSETTINGS.maxGraphs < 60) saveSetting("maxGraphs", 60) // override everyone's settings because they can't set this value anywhere whoops
   MODULES.graphs = {}
   MODULES.graphs.useDarkAlways = false
 }
