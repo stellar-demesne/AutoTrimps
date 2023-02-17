@@ -93,6 +93,7 @@ function loadGraphData() {
     }
   }
   GRAPHSETTINGS.open = false;
+  GRAPHSETTINGS.maxGraphs = 60 // override everyone's settings because they can't set this value anywhere whoops
   MODULES.graphs = {}
   MODULES.graphs.useDarkAlways = false
 }
@@ -112,15 +113,13 @@ function clearData(keepN, clrall = false) {
     }
   }
   else { // keep keepN portals, delete the rest
-    let keep = Object.keys(portalSaveData).splice(Object.keys(portalSaveData).length - keepN);
+    var portals = Object.keys(portalSaveData);
     debug(`Existing Portals (${Object.keys(portalSaveData).length}): ${Object.keys(portalSaveData)}`)
-    debug(`Keeping ${keepN}: ${keep}`)
-    for (const portalID of Object.keys(portalSaveData)) {
-      if (!keep.includes(portalID)) {
-        delete portalSaveData[portalID];
-        debug(`Deleting ${portalID}, keepn ${keepN}`)
-        changed = true;
-      }
+    while (keepN < portals.length) {
+      let current = portals.shift();
+      debug(`Deleting ${current}, keepn ${keepN}`)
+      delete portalSaveData[current];
+      changed = true;
     }
   }
   if (changed) {
