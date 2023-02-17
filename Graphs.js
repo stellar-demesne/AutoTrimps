@@ -11,6 +11,7 @@ function safeLocalStorage(name, data) {
   } catch (e) {
     if (e.code == 22 || e.code == 1014) { // 
       // Storage full, delete oldest portal from history, and try again
+      debug(`Deleting ${Object.keys(portalSaveData)[0]}, out of storage`)
       delete portalSaveData[Object.keys(portalSaveData)[0]];
       savePortalData(true);
       safeLocalStorage(name, data)
@@ -105,6 +106,7 @@ function clearData(keepN, clrall = false) {
     for (const [portalID, portalData] of Object.entries(portalSaveData)) {
       if (portalData.totalPortals != currentPortalNumber) {
         delete portalSaveData[portalID];
+        debug(`Deleting ${portalID}, clearall ${clrall}`)
         changed = true;
       }
     }
@@ -114,6 +116,7 @@ function clearData(keepN, clrall = false) {
     for (const portalID of Object.keys(portalSaveData)) {
       if (!keep.includes(portalID)) {
         delete portalSaveData[portalID];
+        debug(`Deleting ${portalID}, keepn ${keepN}`)
         changed = true;
       }
     }
@@ -129,7 +132,10 @@ function deleteSpecific() {
   if (parseInt(portalNum) < 0) { clearData(Math.abs(portalNum)); } // keep X portals, delete the rest
   else {
     for (const [portalID, portalData] of Object.entries(portalSaveData)) {
-      if (portalData.totalPortals === portalNum) delete portalSaveData[portalID];
+      if (portalData.totalPortals === portalNum) {
+        delete portalSaveData[portalID];
+        debug(`Deleting ${portalID}, deleteSpecific`)
+      }
     }
   }
   savePortalData(true)
@@ -1064,6 +1070,8 @@ var GRAPHSETTINGS = {
   portalsDisplayed: 30
 }
 var portalSaveData = {}
+
+if (localStorage["allSaveData"]) delete localStorage["allSaveData"]; // remove old AT graph data
 
 // load and initialize the UI
 loadGraphData();
