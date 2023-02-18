@@ -948,6 +948,7 @@ const graphList = [
       { dataVar: "totalNullifium", title: "Nu", color: "#8a008a" },
       { dataVar: "heliumOwned", universe: 1, title: "Helium", color: "#5bc0de" },
       { dataVar: "radonOwned", universe: 2, title: "Radon", color: "#5bc0de" },
+      { dataVar: "c23increase", title: "C2 Bonus", color: "#003b99" },
       { dataVar: "fluffy", universe: 1, title: "Pet Exp", color: "green", customFunction: (portal, x) => { return x - portal.initialFluffy } },
       { dataVar: "scruffy", universe: 2, title: "Pet Exp", color: "green", customFunction: (portal, x) => { return x - portal.initialScruffy } },
       { dataVar: "currentTime", title: "Run Time", type: "datetime", color: "#928DAD" }, // TODO some vars should be on shared axes... woo
