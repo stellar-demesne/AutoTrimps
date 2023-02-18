@@ -114,7 +114,7 @@ function clearData(keepN, clrall = false) {
   }
   else { // keep keepN portals, delete the rest
     var portals = Object.keys(portalSaveData);
-    debug(`Existing Portals (${Object.keys(portalSaveData).length}): ${Object.keys(portalSaveData)}`)
+    if (keepN < portals.length) debug(`Existing Portals (${Object.keys(portalSaveData).length}): ${Object.keys(portalSaveData)}`)
     while (keepN < portals.length) {
       let current = portals.shift();
       debug(`Deleting ${current}, keepn ${keepN}`)
@@ -741,6 +741,10 @@ function Portal() {
         if (fromMap && game.global.mapsActive) { data[world] = data[world] + 1 || 1; } // start at 1 because the hook in is before the map is started/finished
         continue;
       }
+      if (name === "c23increase") {
+        data[world] = Math.max(getGameData[name](), data[world] || 0);
+        continue;
+      }
       data[world] = getGameData[name]();
     }
   }
@@ -998,8 +1002,11 @@ const toggledGraphs = {
       graph.useAccumulator = false // HACKS this might be incredibly stupid, find out later when you use this option for a different case!
     },
     customFunction: (portal, item, index, x) => {
-      if (portal.perZoneData[item][index - 1] && portal.perZoneData[item][index]) { // check for missing data, or start of data
+      // TODO changed generic falsy check to undefined, if that's not the only falsy value that we were worried about, say hi to bugs
+      // check for missing data, or start of data
+      if (portal.perZoneData[item][index - 1] !== undefined && portal.perZoneData[item][index] !== undefined) {
         var x = portal.perZoneData[item][index] - portal.perZoneData[item][index - 1]
+        x = Math.max(0, x) // there should be no values that are negative, outside weird data edge cases that we don't want to display
         var time = portal.perZoneData.currentTime[index] - portal.perZoneData.currentTime[index - 1]
       }
       else {
@@ -1120,5 +1127,14 @@ mapsSwitch = function () {
   originalmapsSwitch(...arguments)
   try { if (!game.global.mapsActive) pushData(true); }
   catch (e) { debug("Gather info failed: " + e) }
+}
 
+// On finishing challenges (for c2s)
+var originalabandonChallenge = abandonChallenge;
+abandonChallenge = function () {
+  try {
+    pushData(true);
+  }
+  catch (e) { debug("Gather info failed: " + e) }
+  originalabandonChallenge(...arguments)
 }
