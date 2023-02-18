@@ -536,7 +536,11 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
         if (portal.universe != GRAPHSETTINGS.universeSelection) continue;
         let data;
         if (portal[column.dataVar]) data = portal[column.dataVar];
-        if (portal.perZoneData[column.dataVar]) data = last(portal.perZoneData[column.dataVar]);
+        if (portal.perZoneData[column.dataVar]) {
+          let max = last(portal.perZoneData[column.dataVar]);
+          if (!max) max = Math.max(...portal.perZoneData[column.dataVar].filter(Number.isFinite))
+          data = max;
+        }
         if (column.customFunction) data = column.customFunction(portal, data);
         if (GRAPHSETTINGS.toggles[this.id].perHr) { // HACKS a headache for future me if other toggles are wanted here.
           data = data / (last(portal.perZoneData.currentTime) / 3600000);
@@ -851,7 +855,7 @@ const getGameData = {
 
 // To add a new graph, add it to graphList with the desired options,
 // If using a new dataVar, add that to getGameData
-// To make a new toggle, add the required logic to togglesProperties
+// To make a new toggle, add the required logic to toggledGraphs
 
 const graphList = [
   new Graph("currentTime", false, "Clear Time", {
