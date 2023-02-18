@@ -1009,9 +1009,10 @@ const toggledGraphs = {
       graph.useAccumulator = false // HACKS this might be incredibly stupid, find out later when you use this option for a different case!
     },
     customFunction: (portal, item, index, x) => {
-      // TODO changed generic falsy check to undefined, if that's not the only falsy value that we were worried about, say hi to bugs
+      // TODO getting moderately ridiculous here on the 'not 0 but falsy' check
       // check for missing data, or start of data
-      if (portal.perZoneData[item][index - 1] !== undefined && portal.perZoneData[item][index] !== undefined) {
+      if (portal.perZoneData[item][index - 1] !== undefined && portal.perZoneData[item][index - 1] !== null
+        && portal.perZoneData[item][index] !== undefined && portal.perZoneData[item][index] !== null) {
         var x = portal.perZoneData[item][index] - portal.perZoneData[item][index - 1]
         x = Math.max(0, x) // there should be no values that are negative, outside weird data edge cases that we don't want to display
         var time = portal.perZoneData.currentTime[index] - portal.perZoneData.currentTime[index - 1]
