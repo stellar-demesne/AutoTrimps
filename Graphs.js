@@ -93,7 +93,6 @@ function loadGraphData() {
     }
   }
   GRAPHSETTINGS.open = false;
-  if (GRAPHSETTINGS.maxGraphs < 60) saveSetting("maxGraphs", 60) // override everyone's settings because they can't set this value anywhere whoops
   MODULES.graphs = {}
   MODULES.graphs.useDarkAlways = false
 }
@@ -251,7 +250,8 @@ function createUI() {
   document.getElementById("graphFooterLine2").innerHTML += `
     <span style="float: left;" onmouseover='tooltip("Tips", "customText", event, "${tipsText}")' onmouseout='tooltip("hide")'>Tips: Hover for usage tips.</span>
     <span style="float: left; margin-left: 2vw"><input type="checkbox" id="liveCheckbox" onclick="saveSetting('live', this.checked);"> Live Updates</span>
-    <span style="float: left; margin-left: 2vw">Show <input style="width:40px;" id="portalCountTextBox" onchange="saveSetting('portalsDisplayed', this.value); updateGraph();"> Portals</span>
+    <span style="float: left; margin-left: 2vw">Displayed Portals: <input style="width:40px;" id="portalCountTextBox" onchange="saveSetting('portalsDisplayed', this.value); updateGraph();"></span>
+    <span style="float: left; margin-left: 2vw">Saved Portals: <input style="width:40px;" id="portalsSavedTextBox" onchange="saveSetting('maxGraphs', this.value); clearData(this.value); updateGraph();"></span>
     <input onclick="toggleDarkGraphs()" style="height: 20px; float: right; margin-right: 0.5vw;" type="checkbox" id="blackCB">
     <span style="float: right; margin-right: 0.5vw;">Black Graphs:</span>
     `;
@@ -289,6 +289,7 @@ function createUI() {
   MODULES.graphs.themeChanged();
 
   document.querySelector("#portalCountTextBox").value = GRAPHSETTINGS.portalsDisplayed;
+  document.querySelector("#portalsSavedTextBox").value = GRAPHSETTINGS.maxGraphs;
 }
 
 // Show/hide the universe-specific graph selectors
