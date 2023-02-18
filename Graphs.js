@@ -1,4 +1,11 @@
 // --------- Backend and helpers --------- 
+var enableGraphsDebug = false;
+function graphsDebug(message) {
+  if (enableGraphsDebug)
+    console.debug(...arguments);
+}
+
+
 function safeLocalStorage(name, data) {
   try {
     if (name === "portalDataCurrent") {
