@@ -11,7 +11,7 @@ function safeLocalStorage(name, data) {
   } catch (e) {
     if (e.code == 22 || e.code == 1014) { // 
       // Storage full, delete oldest portal from history, and try again
-      debug(`Deleting ${Object.keys(portalSaveData)[0]}, out of storage`)
+      graphsDebug(`Deleting ${Object.keys(portalSaveData)[0]}, out of storage`)
       delete portalSaveData[Object.keys(portalSaveData)[0]];
       savePortalData(true);
       safeLocalStorage(name, data)
@@ -106,23 +106,23 @@ function clearData(keepN, clrall = false) {
     for (const [portalID, portalData] of Object.entries(portalSaveData)) {
       if (portalData.totalPortals != currentPortalNumber) {
         delete portalSaveData[portalID];
-        debug(`Deleting ${portalID}, clearall ${clrall}`)
+        graphsDebug(`Deleting ${portalID}, clearall ${clrall}`)
         changed = true;
       }
     }
   }
   else { // keep keepN portals, delete the rest
     var portals = Object.keys(portalSaveData);
-    if (keepN < portals.length) debug(`Existing Portals (${Object.keys(portalSaveData).length}): ${Object.keys(portalSaveData)}`)
+    if (keepN < portals.length) graphsDebug(`Existing Portals (${Object.keys(portalSaveData).length}): ${Object.keys(portalSaveData)}`)
     while (keepN < portals.length) {
       let current = portals.shift();
-      debug(`Deleting ${current}, keepn ${keepN}`)
+      graphsDebug(`Deleting ${current}, keepn ${keepN}`)
       delete portalSaveData[current];
       changed = true;
     }
   }
   if (changed) {
-    debug("Saving Portal Data after deletions")
+    graphsDebug("Saving Portal Data after deletions")
     savePortalData(true)
     showHideUnusedGraphs();
   }
@@ -135,7 +135,7 @@ function deleteSpecific() {
     for (const [portalID, portalData] of Object.entries(portalSaveData)) {
       if (portalData.totalPortals === portalNum) {
         delete portalSaveData[portalID];
-        debug(`Deleting ${portalID}, deleteSpecific`)
+        graphsDebug(`Deleting ${portalID}, deleteSpecific`)
       }
     }
   }
@@ -317,11 +317,11 @@ function toggleDarkGraphs() {
       b.id = "dark-graph.css";
       b.href = basepath + "dark-graph.css";
       document.head.appendChild(b);
-      debug("Adding dark-graph.css file", "graphs");
+      graphsDebug("Adding dark-graph.css file", "graphs");
     }
     else if (darkcss && !dark) {
       document.head.removeChild(darkcss)
-      debug("Removing dark-graph.css file", "graphs")
+      graphsDebug("Removing dark-graph.css file", "graphs")
     }
   }
 }
@@ -493,7 +493,7 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
           try { x = toggledGraphs[toggle].customFunction(portal, item, index, x, time, maxS3); }
           catch (e) {
             x = 0;
-            debug(`Error graphing data on: ${item} ${toggle}, ${e.message}`)
+            graphsDebug(`Error graphing data on: ${item} ${toggle}, ${e.message}`)
           }
         }
         if (this.useAccumulator) { x += last(cleanData) !== undefined ? last(cleanData)[1] : 0; }
@@ -1037,7 +1037,7 @@ const toggledGraphs = {
       if (item === "radonOwned") { initial = portal.totalRadon; }
       if (item === "c23increase") { initial = portal.cinf; }
       if (!initial) {
-        debug("Attempted to calc lifetime percent of an unknown type:" + item);
+        graphsDebug("Attempted to calc lifetime percent of an unknown type:" + item);
         return 0;
       }
       if (item === "c23increase") {
@@ -1100,7 +1100,7 @@ nextWorld = function () {
     if (null === portalSaveData) portalSaveData = {};
     if (getGameData.world()) { pushData(); }
   }
-  catch (e) { debug("Gather info failed: " + e) }
+  catch (e) { graphsDebug("Gather info failed: " + e) }
   originalnextWorld(...arguments);
 }
 
@@ -1108,7 +1108,7 @@ nextWorld = function () {
 var originalactivatePortal = activatePortal;
 activatePortal = function () {
   try { pushData(); }
-  catch (e) { debug("Gather info failed: " + e) }
+  catch (e) { graphsDebug("Gather info failed: " + e) }
   originalactivatePortal(...arguments)
 }
 
@@ -1117,7 +1117,7 @@ activatePortal = function () {
 var originalbuildMapGrid = buildMapGrid;
 buildMapGrid = function () {
   try { pushData(true); }
-  catch (e) { debug("Gather info failed: " + e) }
+  catch (e) { graphsDebug("Gather info failed: " + e) }
   originalbuildMapGrid(...arguments)
 }
 
@@ -1127,7 +1127,7 @@ var originalmapsSwitch = mapsSwitch;
 mapsSwitch = function () {
   originalmapsSwitch(...arguments)
   try { if (!game.global.mapsActive) pushData(true); }
-  catch (e) { debug("Gather info failed: " + e) }
+  catch (e) { graphsDebug("Gather info failed: " + e) }
 }
 
 // On finishing challenges (for c2s)
@@ -1136,6 +1136,6 @@ abandonChallenge = function () {
   try {
     pushData(true);
   }
-  catch (e) { debug("Gather info failed: " + e) }
+  catch (e) { graphsDebug("Gather info failed: " + e) }
   originalabandonChallenge(...arguments)
 }
