@@ -876,7 +876,7 @@ const graphList = [
     toggles: ["perHr", "perZone", "lifetime"]
   }),
   new Graph("fluffy", 1, "Fluffy Exp", {
-    conditional: () => { return getGameData.u1hze() >= 299 && getGameData.fluffy() < 3413330078125000 }, // pre unlock, post E10L10
+    conditional: () => { return getGameData.u1hze() >= 299 && getGameData.fluffy() < 4266662510275000 }, // pre unlock, post E10L10
     customFunction: (portal, i) => { return diff("fluffy", portal.initialFluffy)(portal, i) },
     toggles: ["perHr", "perZone",]
   }),
