@@ -541,14 +541,14 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
       var cleanData = []
       for (const portal of Object.values(portalSaveData)) {
         if (portal.universe != GRAPHSETTINGS.universeSelection) continue;
-        var data;
-        if (portal[column.dataVar]) data = portal[column.dataVar];
+        var data = undefined;
+        if (portal[column.dataVar]) { data = portal[column.dataVar]; }
         if (portal.perZoneData[column.dataVar]) {
           var max = last(portal.perZoneData[column.dataVar]);
           if (!max) max = Math.max(...portal.perZoneData[column.dataVar].filter(Number.isFinite))
           data = max;
         }
-        if (column.customFunction) data = column.customFunction(portal, data);
+        if (column.customFunction) { data = column.customFunction(portal, data); }
         if (GRAPHSETTINGS.toggles[this.id].perHr) { // HACKS a headache for future me if other toggles are wanted here.
           data = data / (last(portal.perZoneData.currentTime) / 3600000);
         }
