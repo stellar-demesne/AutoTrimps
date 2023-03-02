@@ -567,6 +567,8 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
       this.graphData.push(series);
       yAxis += 1;
     }
+    // reduce padding between portals as portals increase
+    highChartsObj.plotOptions.series["groupPadding"] = .5 / this.graphData[0].data.length ** .6;
     if (this.graphData[0].data.length > 15) {
       highChartsObj.plotOptions.series["borderWidth"] = 0.1;
     }
