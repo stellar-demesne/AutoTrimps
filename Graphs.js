@@ -539,8 +539,9 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
     var yAxis = 0;
     for (const column of activeColumns) {
       var cleanData = []
-      for (const portal of Object.values(portalSaveData).slice(Math.max(Object.values(portalSaveData).length - 1 - GRAPHSETTINGS.portalsDisplayed, 0))) {
-        if (portal.universe != GRAPHSETTINGS.universeSelection) continue;
+      var currUniPortals = Object.values(portalSaveData).filter(portal => portal.universe == GRAPHSETTINGS.universeSelection);
+      for (const portal of Object.values(currUniPortals).slice(Math.max(Object.values(currUniPortals).length - GRAPHSETTINGS.portalsDisplayed, 0))) {
+        //if (portal.universe != GRAPHSETTINGS.universeSelection) continue;
         var data = undefined;
         if (portal[column.dataVar]) { data = portal[column.dataVar]; }
         if (portal.perZoneData[column.dataVar]) {
