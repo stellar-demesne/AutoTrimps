@@ -293,10 +293,11 @@ function createUI() {
   }
 
   document.querySelector("#blackCB").checked = GRAPHSETTINGS.darkTheme;
-  MODULES.graphs.themeChanged();
-
   document.querySelector("#portalCountTextBox").value = GRAPHSETTINGS.portalsDisplayed;
   document.querySelector("#portalsSavedTextBox").value = GRAPHSETTINGS.maxGraphs;
+  document.querySelector("#liveCheckbox").checked = GRAPHSETTINGS.live;
+  MODULES.graphs.themeChanged();
+
 }
 
 // Show/hide the universe-specific graph selectors
