@@ -409,6 +409,9 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
       title: {
         text: this.graphTitle,
         x: -20,
+        style: {
+          fontSize: '2rem'
+        }
       },
       plotOptions: {
         series: {
@@ -423,12 +426,23 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
         floor: this.xminFloor,
         title: {
           text: this.xTitle,
+          style: {
+            fontSize: "1.5rem"
+          },
+        },
+        labels: {
+          style: {
+            fontSize: "1.2rem"
+          },
         },
       },
       yAxis: {
         floor: this.yminFloor,
         title: {
           text: this.yTitle,
+          style: {
+            fontSize: "1.5rem"
+          },
         },
         plotLines: [
           {
@@ -439,7 +453,10 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
         ],
         type: this.yType,
         labels: {
-          formatter: formatters.defaultAxis
+          formatter: formatters.defaultAxis,
+          style: {
+            fontSize: "1.2rem"
+          },
         },
         endOnTick: false,
         maxPadding: .05,
@@ -452,6 +469,9 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
         align: "right",
         verticalAlign: "middle",
         borderWidth: 0,
+        itemStyle: {
+          fontSize: "1rem"
+        },
       },
       series: this.graphData,
       additionalParams: {},
@@ -1089,7 +1109,7 @@ const toggledGraphs = {
 // --------- Runtime ---------
 
 var chart1;
-if (!MODULES) MODULES = {}; // don't overwrite if AT has already created this
+if (typeof foo === 'undefined') MODULES = {}; // don't overwrite if AT has already created this
 var lastSave = new Date();
 var GRAPHSETTINGS = {
   universeSelection: 1,
