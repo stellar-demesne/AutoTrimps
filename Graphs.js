@@ -1109,7 +1109,7 @@ const toggledGraphs = {
 // --------- Runtime ---------
 
 var chart1;
-if (typeof foo === 'undefined') MODULES = {}; // don't overwrite if AT has already created this
+if (typeof MODULES === 'undefined') MODULES = {}; // don't overwrite if AT has already created this
 var lastSave = new Date();
 var GRAPHSETTINGS = {
   universeSelection: 1,
