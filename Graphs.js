@@ -463,14 +463,20 @@ function Graph(dataVar, universe, selectorText, additionalParams = {}) {
       },
       tooltip: {
         pointFormatter: this.formatter,
+        style: {
+          fontSize: "1.2rem"
+        },
       },
       legend: {
         layout: "vertical",
         align: "right",
         verticalAlign: "middle",
         borderWidth: 0,
+        padding: 0,
+        itemMarginBottom: 0,
+        itemMarginTop: 0,
         itemStyle: {
-          fontSize: "1rem"
+          fontSize: "1rem",
         },
       },
       series: this.graphData,
@@ -989,7 +995,7 @@ const graphList = [
       { dataVar: "fluffy", universe: 1, title: "Pet Exp", color: "green", customFunction: (portal, x) => { return x - portal.initialFluffy } },
       { dataVar: "scruffy", universe: 2, title: "Pet Exp", color: "green", customFunction: (portal, x) => { return x - portal.initialScruffy } },
       { dataVar: "c23increase", title: "C2 Bonus", color: "#003b99" },
-      { dataVar: "mutatedSeeds", title: "Mutated Seeds", customFunction: (portal, x) => { return x - portal.initialMutes } },
+      { dataVar: "mutatedSeeds", universe: 2, title: "Mutated Seeds", customFunction: (portal, x) => { return x - portal.initialMutes } },
       { dataVar: "world", title: "Zone Reached", color: "#a16e08", customFunction: (portal, x) => { return portal.perZoneData.mapbonus.length - 1 } },
       { dataVar: "currentTime", title: "Run Time", type: "datetime", color: "#928DAD" }, // TODO some vars should be on shared axes... woo
       //{ dataVar: "timeOnMap", title: "Mapping Time", type: "datetime", customFunction: () => { } }, // TODO should be sum not max
