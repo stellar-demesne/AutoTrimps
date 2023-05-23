@@ -107,22 +107,24 @@ function loadGraphData() {
 function clearData(keepN, clrall = false) {
   // TODO it is awkward as fuck that this works on portal number, when IDs are universe + portal number.  
   // Fixing that would remove a lot of ugliness here and in deleteSpecific.
+  var universe = GRAPHSETTINGS.universeSelection
   var changed = false;
   var currentPortalNumber = getTotalPortals();
   if (clrall) { // delete all but current
     for (const [portalID, portalData] of Object.entries(portalSaveData)) {
-      if (portalData.totalPortals != currentPortalNumber) {
+      if (portalData.totalPortals != currentPortalNumber && portalData.universe == universe) { // only delete currently selected universe data
         delete portalSaveData[portalID];
         graphsDebug(`Deleting ${portalID}, clearall ${clrall}`)
         changed = true;
       }
     }
   }
-  else { // keep keepN portals, delete the rest
-    var portals = Object.keys(portalSaveData);
+  else { // keep keepN portals in selected universe , delete the rest
+    var portals = Object.entries(portalSaveData).filter((data) => data[1].universe == universe).map((data) => { return data[0] });
+    // TODO 100% sure there's a better way than filter().map() but I'm not looking it up right now
     if (keepN < portals.length) graphsDebug(`Existing Portals (${Object.keys(portalSaveData).length}): ${Object.keys(portalSaveData)}`)
     while (keepN < portals.length) {
-      var current = portals.shift();
+      var current = portals.shift()
       graphsDebug(`Deleting ${current}, keepn ${keepN}`)
       delete portalSaveData[current];
       changed = true;
@@ -140,7 +142,7 @@ function deleteSpecific() {
   if (parseInt(portalNum) < 0) { clearData(Math.abs(portalNum)); } // keep X portals, delete the rest
   else {
     for (const [portalID, portalData] of Object.entries(portalSaveData)) {
-      if (portalData.totalPortals === portalNum) {
+      if (portalData.totalPortals === portalNum && portalData.universe == GRAPHSETTINGS.universeSelection) { // only delete if in selected universe
         delete portalSaveData[portalID];
         graphsDebug(`Deleting ${portalID}, deleteSpecific`)
       }
@@ -240,10 +242,10 @@ function createUI() {
     <div><input type="checkbox" id="clrChkbox" onclick="toggleClearButton();"></div>
     <div style="margin-left: 0.5vw;">
       <button id="clrAllDataBtn" onclick="clearData(null,true); drawGraph();" class="btn" disabled="" style="flex:auto; padding: 2px 6px;border: 1px solid white;">
-        Clear All Previous Data</button></div>
+        Clear All U1 Data</button></div>
     <div style="flex:0 100 5%;"></div>
     <div style="flex:0 2 3.5vw;"><input style="width:100%;min-width: 40px;" id="deleteSpecificTextBox"></div>
-    <div style="flex:auto; margin-left: 0.5vw;"><button onclick="deleteSpecific(); drawGraph();">Delete Specific Portal</button></div>
+    <div style="flex:auto; margin-left: 0.5vw;"><button id="deleteSpecificBtn" onclick="deleteSpecific(); drawGraph();">Delete Specific U1 Portal</button></div>
     <div style="float:right; margin-right: 0.5vw;"><button onclick="toggleSpecificGraphs()">Invert Selection</button></div>
     <div style="float:right; margin-right: 1vw;"><button onclick="toggleAllGraphs()">All Off/On</button></div>`
 
@@ -307,6 +309,8 @@ function swapGraphUniverse() {
   var inactive = `u${universe == 1 ? 2 : 1}`
   document.getElementById(`${active}graphSelection`).style.display = '';
   document.getElementById(`${inactive}graphSelection`).style.display = 'none';
+  document.getElementById("clrAllDataBtn").innerText = `Clear All U${universe} Data`;
+  document.getElementById("deleteSpecificBtn").innerText = `Delete Specific U${universe} Portal`;
 }
 
 function toggleClearButton() {
