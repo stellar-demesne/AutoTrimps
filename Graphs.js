@@ -977,7 +977,7 @@ const graphList = [
   new Graph("coord", false, "Coordinations", {
     graphTitle: "Unbought Coordinations",
   }),
-  new Graph("coordsbought", false, "Coordinations", {
+  new Graph("coordsbought", false, "Coordinations Bought", {
     graphTitle: "Bought Coordinations",
   }),
   new Graph("overkill", false, "Overkill Cells", {
