@@ -832,6 +832,7 @@ const getGameData = {
   totalVoids: () => { return game.stats.totalVoidMaps.value },
   nullifium: () => { return recycleAllExtraHeirlooms(true) },
   coord: () => { return game.upgrades.Coordination.allowed - game.upgrades.Coordination.done },
+  coordsbought: () => { return game.upgrades.Coordination.done },
   overkill: () => {
     // overly complex check for Liq, overly fragile check for overkill cells. please rewrite this at some point.
     if (game.options.menu.overkillColor.enabled == 0) toggleSetting("overkillColor");
@@ -975,6 +976,9 @@ const graphList = [
   }),
   new Graph("coord", false, "Coordinations", {
     graphTitle: "Unbought Coordinations",
+  }),
+  new Graph("coordsbought", false, "Coordinations", {
+    graphTitle: "Bought Coordinations",
   }),
   new Graph("overkill", false, "Overkill Cells", {
     // Overkill unlock zones (roughly)
