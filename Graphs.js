@@ -988,7 +988,7 @@ const Graphs = {
 			if (Graphs.Settings.toggles[this.id].perHr) {
 				let disabledCols = ["Run Time", "Initial Helium", "Initial Radon"] // time, and start-of-portal stats
 				GraphsConfig.toggledGraphs.perHr.graphMods(false, highChartsObj)
-				activeColumns = activeColumns.filter(column => disabledCols.includes(column.title))
+				activeColumns = activeColumns.filter(column => !disabledCols.includes(column.title))
 			}
 			this.graphData = [];
 			var yAxis = 0;
