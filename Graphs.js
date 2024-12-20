@@ -1,6 +1,7 @@
 const Graphs = {
 	Backend: {
 		_lastSave: new Date(),
+
 		_safeLocalStorage: function (name, data) {
 			try {
 				if (name === "portalDataCurrent") {
@@ -551,11 +552,13 @@ const Graphs = {
 
 	ChartArea: {
 		chart: undefined,
+
 		_lookupGraph: function (selectorText) {
 			for (const graph of GraphsConfig.graphList) {
 				if (graph.selectorText === selectorText) return graph;
 			}
 		},
+
 		draw: function () {
 			// Draws the graph currently selected by the user
 			function makeCheckbox(graph, toggle) {
@@ -981,9 +984,11 @@ const Graphs = {
 			highChartsObj.plotOptions.series = { groupPadding: .2, pointPadding: 0, animation: false, borderColor: "black" }
 			// set up axes for each column so they scale independently
 			var activeColumns = this.columns.filter(column => !(column.universe && column.universe != Graphs.Settings.universeSelection));
-			if (Graphs.Settings.toggles[this.id].perHr) { // disable time when comparing things over time.  x/x is not interesting data.
+			// disable columns that make no sense to show over time.
+			if (Graphs.Settings.toggles[this.id].perHr) {
+				let disabledCols = ["Run Time", "Initial Helium", "Initial Radon"] // time, and start-of-portal stats
 				GraphsConfig.toggledGraphs.perHr.graphMods(false, highChartsObj)
-				activeColumns = activeColumns.filter(column => column.dataVar !== "currentTime")
+				activeColumns = activeColumns.filter(column => disabledCols.includes(column.title))
 			}
 			this.graphData = [];
 			var yAxis = 0;
@@ -1370,8 +1375,10 @@ const GraphsConfig = {
 				{ dataVar: "scruffy", universe: 2, title: "Pet Exp", color: "green", customFunction: (portal, x) => { return x - portal.initialScruffy } },
 				{ dataVar: "c23increase", title: "C2 Bonus", color: "#003b99" },
 				{ dataVar: "mutatedSeeds", universe: 2, title: "Mutated Seeds", customFunction: (portal, x) => { return x - portal.initialMutes } },
-				{ dataVar: "world", title: "Zone Reached", color: "#a16e08", customFunction: (portal, x) => { return portal.perZoneData.mapbonus.length - 1 } },
-				{ dataVar: "currentTime", title: "Run Time", type: "datetime", color: "#928DAD" }, // TODO some vars should be on shared axes... woo
+				{ dataVar: "world", title: "Zone Reached", color: "#a16e08", customFunction: (portal, x) => { return portal.perZoneData.mapbonus.length - 1 } }, // WHY from that stat? 
+				{ dataVar: "currentTime", title: "Run Time", type: "datetime", color: "#928DAD" }, // TODO some vars should be on shared axes... woo 
+				{ dataVar: "heliumOwned", title: "Initial Helium", universe: 1, color: "#3090a0", customFunction: (portal, x) => { return portal.totalHelium } },
+				{ dataVar: "radonOwned", title: "Initial Radon", universe: 2, color: "#3090a0", customFunction: (portal, x) => { return portal.totalRadon } },
 				//{ dataVar: "timeOnMap", title: "Mapping Time", type: "datetime", customFunction: () => { } }, // TODO should be sum not max
 			],
 		}),
