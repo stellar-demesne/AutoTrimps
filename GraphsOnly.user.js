@@ -7,6 +7,7 @@
 // @author       zininzinin, spindrjr, belaith, ishakaru, genBTC, Zek, Quia
 // @include      *trimps.github.io*
 // @include      *kongregate.com/games/GreenSatellite/trimps
+// @include      *trimpstest*.netlify.app/
 // @grant        none
 // ==/UserScript==
 var script = document.createElement('script');
