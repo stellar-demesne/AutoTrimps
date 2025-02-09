@@ -328,6 +328,10 @@ const Graphs = {
 					border-radius: 0px;
 					border: 1px solid white;
 				}
+
+				#graphParent input[type=checkbox] {
+				  appearance: auto !important;
+				}
 			`;
 			document.head.appendChild(styleElem);
 		},
@@ -569,6 +573,7 @@ const Graphs = {
 				var label = document.createElement("span");
 
 				container.style.padding = "0rem .5rem";
+				checkbox.className = "graphsCheckbox"
 				checkbox.type = "checkbox";
 				checkbox.id = toggle;
 				// initialize the checkbox to saved value
