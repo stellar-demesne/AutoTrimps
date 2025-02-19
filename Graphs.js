@@ -909,6 +909,7 @@ const Graphs = {
 			var activeDataVars = [item]
 			activeToggles.forEach(toggle => { if (GraphsConfig.toggledGraphs[toggle].dataVars) activeDataVars.push(GraphsConfig.toggledGraphs[toggle].dataVars) });
 			var portalCount = 0;
+			let xMinData = 810;
 			// parse data per portal
 			for (const portal of Object.values(Graphs.portalSaveData).reverse()) {
 				if (!activeDataVars.some(dvar => dvar in portal.perZoneData)) continue; // ignore completely blank
@@ -975,8 +976,17 @@ const Graphs = {
 						}
 					}
 				})
+				// customs 'zooms' 
+				if (["nursery", 'coord'].includes(item)) {
+					let data = cleanData.map(([zone, data]) => {return data})
+					let portalMin = data.findIndex((z) => { return z >= 2})
+					if (portalMin != -1) xMinData = Math.min(xMinData, portalMin)
+				}
 				portalCount++;
 				if (portalCount >= Graphs.Settings.portalsDisplayed) break;
+			}
+			if (["nursery", 'coord'].includes(item)) {
+				highChartsObj.xAxis.floor = xMinData - 2 // force zoom to where we start missing coords / have built nurseries
 			}
 			highChartsObj.series = this.graphData;
 			return highChartsObj;
