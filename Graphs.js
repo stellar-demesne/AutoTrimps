@@ -516,7 +516,7 @@ const Graphs = {
 					Graphs.Settings.open = !open;
 					trimpStatsDisplayed = !open; // HACKS disable hotkeys without touching Trimps settings
 				}
-				else if (elem.style.display = "block") { // close other windows
+				else if (elem.style.display == "block") { // close other windows
 					if (elemId == "settingsHere") game.options.displayed = !game.options.displayed;
 					elem.style.display = "none"; 
 				}
