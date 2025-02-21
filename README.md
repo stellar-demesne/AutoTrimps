@@ -14,11 +14,14 @@ Click this link: https://github.com/Quiaaaa/AutoTrimps/raw/gh-pages/GraphsOnly.u
 If clicking the link does not work, copy the contents of user.js into a new script inside tampermonkey.  
 If you are unsure how to do that, copy this:  
 ```
-var script = document.createElement('script');
-script.id = 'Quia-Graphs';
-script.src = 'https://Quiaaaa.github.io/AutoTrimps/GraphsOnly.js';
-script.setAttribute('crossorigin', "anonymous");
-document.head.appendChild(script);
+function loadScript(id, src) {
+	const script = document.createElement('script');
+	script.id = id;
+	script.src = `${src}?${Date.now()}`;
+	script.setAttribute('crossorigin', 'anonymous');
+	document.head.appendChild(script);
+}
+setTimeout(() => loadScript('Graphs', 'https://Quiaaaa.github.io/AutoTrimps/' + 'Graphs.js'), 1000);
 ```  
 Press F12 inside the game, this opens the console, and paste the text into it and hit enter, this will load the script. You will have to do this everytime you refresh the game though so I recommend getting tampermonkey to do it for you!
 

@@ -506,7 +506,7 @@ const Graphs = {
 			// Toggle AT windows with UI, or force close with Esc
 			var a = document.getElementById("tooltipDiv");
 			if (a.style.display != "none") return void cancelTooltip(); // old code, uncertain what it's for or why it's here.
-			for (elemId of ["autoSettings", "autoTrimpsTabBarMenu", "settingsHere", "graphParent"]) {
+			for (const elemId of ["autoSettings", "autoTrimpsTabBarMenu", "settingsHere", "graphParent"]) {
 				var elem = document.getElementById(elemId);
 				if (!elem) continue;
 				if (elemId === "graphParent") { // toggle Graphs window
@@ -517,7 +517,7 @@ const Graphs = {
 					trimpStatsDisplayed = !open; // HACKS disable hotkeys without touching Trimps settings
 				}
 				else if (elem.style.display = "block") { // close other windows
-					if (elemID == "settingsHere") game.options.displayed = !game.options.displayed;
+					if (elemId == "settingsHere") game.options.displayed = !game.options.displayed;
 					elem.style.display = "none"; 
 				}
 			}

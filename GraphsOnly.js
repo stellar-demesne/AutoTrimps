@@ -1,12 +1,9 @@
-var graphsBasePath = 'https://Quiaaaa.github.io/AutoTrimps/' //Link to your own Github here if you forked!
-//var graphsBasePath = '/AutoTrimps/'
-
-function injectScript(id, src) {
+function loadScript(id, src) {
 	const script = document.createElement('script');
 	script.id = id;
-	script.src = src;
+	script.src = `${src}?${Date.now()}`;
 	script.setAttribute('crossorigin', 'anonymous');
 	document.head.appendChild(script);
 }
+setTimeout(() => loadScript('Graphs', 'https://Quiaaaa.github.io/AutoTrimps/' + 'Graphs.js'), 1000);
 
-setTimeout(() => injectScript('Graphs', graphsBasePath + 'Graphs.js'), 1000);
