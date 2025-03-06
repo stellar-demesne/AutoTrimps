@@ -1273,6 +1273,7 @@ const GraphsConfig = {
 				if (challengeActive(chal)) return game.challenges[chal][stacks]
 			}
 		},
+		meteorologists: () => { return game.jobs.Meteorologist.vestedHires },
 	},
 
 	// Create all the Graph objects
@@ -1341,6 +1342,11 @@ const GraphsConfig = {
 			xminFloor: 50,
 		}),
 		new Graphs.Graph("smithies", 2, "Smithies"),
+		new Graphs.Graph("meteorologists", 2, "Meteorologists", {
+			graphTitle: "Active Meteorologists", 
+			conditional: () => { return GraphsConfig.getGameData.u2hze() >= 25 },
+			xminFloor: 31,
+		}),
 		new Graphs.Graph("bonfires", 2, "Bonfires", {
 			graphTitle: "Active Bonfires",
 			conditional: () => { return GraphsConfig.getGameData.challengeActive() === "Hypothermia" }
