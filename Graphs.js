@@ -1561,7 +1561,8 @@ const GraphsConfig = {
 			},
 			customFunction: (portal, item, index, x) => {
 				let universe = portal.universe
-				let hze = (universe == 1 ? portal.u1hze : portal.u2hze) ?? Graphs.portalSaveData[`u${universe} p${portal.portalCount-1}`].currentTime.length - 1;
+				let hze = (universe == 1 ? portal.u1hze : portal.u2hze);
+				if (!hze) Graphs.portalSaveData[`u${universe} p${portal.portalCount-1}`].currentTime.length - 1;
 				if (hze > 200) hze = 200
 				if (hze < 80) hze = 80
 				let min = 1000 + ((hze - 80) * 13);
