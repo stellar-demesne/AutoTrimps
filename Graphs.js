@@ -1064,6 +1064,8 @@ const Graphs = {
 		// Stores and updates data for an individual portal
 		this.universe = GraphsConfig.getGameData.universe();
 		this.totalPortals = getTotalPortals();
+		this.u1hze = GraphsConfig.getGameData.u1hze()
+		this.u2hze = GraphsConfig.getGameData.u2hze()
 		this.challenge = GraphsConfig.getGameData.challengeActive() === 'Daily'
 			? getCurrentChallengePane().split('.')[0].substr(13).slice(0, 16) // names dailies by their start date, only moderately cursed
 			: GraphsConfig.getGameData.challengeActive();
@@ -1366,8 +1368,9 @@ const GraphsConfig = {
 			toggles: ["perHr", "perZone", "lifetime"]
 		}),
 		new Graphs.Graph("voids", false, "Void Map History", {
-			graphTitle: "Void Map History (voids finished during the same level acquired are not counted/tracked)",
-			yTitle: "Number of Void Maps",
+			graphTitle: "Void Map History",
+			yTitle: "Void Maps Held",
+			toggles: ["hzeNormalized"],
 		}),
 		new Graphs.Graph("coord", false, "Coordinations", {
 			graphTitle: "Unbought Coordinations",
@@ -1550,6 +1553,19 @@ const GraphsConfig = {
 				return x;
 			}
 		},
+		hzeNormalized:  {
+			graphMods: (graph, highChartsObj) => {
+				highChartsObj.title.text += `, Normalized to 200+ HZE`
+			},
+			customFunction: (portal, item, index, x) => {
+				let universe = portal.universe
+				let hze = (universe == 1 ? portal.u1hze : portal.u2hze) ?? Graphs.portalSaveData[`u${universe} p${portal.portalCount-1}`].currentTime.length - 1;
+				if (hze > 200) hze = 200
+				if (hze < 80) hze = 80
+				let min = 1000 + ((hze - 80) * 13);
+				return x / min * 2560 // 200 hze value
+			}
+		}
 	},
 }
 
