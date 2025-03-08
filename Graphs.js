@@ -91,7 +91,7 @@ const Graphs = {
 				if (currentPortal) { loadedData[Object.keys(currentPortal)[0]] = Object.values(currentPortal)[0] }
 				// remake object structure
 				for (const [portalID, portalData] of Object.entries(loadedData)) {
-					Graphs.portalSaveData[portalID] = new Graphs.Portal();
+					Graphs.portalSaveData[portalID] = new Graphs.Portal(true);
 					try {
 						for (const [k, v] of Object.entries(portalData)) {
 							Graphs.portalSaveData[portalID][k] = v;
@@ -1062,29 +1062,29 @@ const Graphs = {
 		}
 	},
 
-	Portal: function () {
+	Portal: function (asBlank) {
 		// Stores and updates data for an individual portal
-		this.universe = GraphsConfig.getGameData.universe();
-		this.totalPortals = getTotalPortals();
-		this.u1hze = GraphsConfig.getGameData.u1hze()
-		this.u2hze = GraphsConfig.getGameData.u2hze()
-		this.challenge = GraphsConfig.getGameData.challengeActive() === 'Daily'
+		this.universe = asBlank ? null : GraphsConfig.getGameData.universe();
+		this.totalPortals = asBlank ? null : getTotalPortals();
+		this.u1hze = asBlank ? null : GraphsConfig.getGameData.u1hze()
+		this.u2hze = asBlank ? null : GraphsConfig.getGameData.u2hze()
+		this.challenge = asBlank ? null : GraphsConfig.getGameData.challengeActive() === 'Daily'
 			? getCurrentChallengePane().split('.')[0].substr(13).slice(0, 16) // names dailies by their start date, only moderately cursed
 			: GraphsConfig.getGameData.challengeActive();
-		this.initialNullifium = game.global.nullifium;
-		this.totalNullifium = GraphsConfig.getGameData.nullifium();
-		this.totalVoidMaps = GraphsConfig.getGameData.totalVoids();
-		this.cinf = GraphsConfig.getGameData.cinf();
+		this.initialNullifium = asBlank ? null : game.global.nullifium;
+		this.totalNullifium = asBlank ? null : GraphsConfig.getGameData.nullifium();
+		this.totalVoidMaps = asBlank ? null : GraphsConfig.getGameData.totalVoids();
+		this.cinf = asBlank ? null : GraphsConfig.getGameData.cinf();
 		if (this.universe === 1) {
-			this.totalHelium = game.global.totalHeliumEarned;
-			this.initialFluffy = GraphsConfig.getGameData.fluffy() - game.stats.bestFluffyExp.value; // adjust for mid-run graph start
-			this.initialDE = GraphsConfig.getGameData.essence();
+			this.totalHelium = asBlank ? null : game.global.totalHeliumEarned;
+			this.initialFluffy = asBlank ? null : GraphsConfig.getGameData.fluffy() - game.stats.bestFluffyExp.value; // adjust for mid-run graph start
+			this.initialDE = asBlank ? null : GraphsConfig.getGameData.essence();
 		}
 		if (this.universe === 2) {
-			this.totalRadon = game.global.totalRadonEarned;
-			this.initialScruffy = GraphsConfig.getGameData.scruffy() - game.stats.bestFluffyExp2.value; // adjust for mid-run graph start
-			this.initialMutes = GraphsConfig.getGameData.mutatedSeeds();
-			this.s3 = GraphsConfig.getGameData.s3();
+			this.totalRadon = asBlank ? null : game.global.totalRadonEarned;
+			this.initialScruffy = asBlank ? null : GraphsConfig.getGameData.scruffy() - game.stats.bestFluffyExp2.value; // adjust for mid-run graph start
+			this.initialMutes = asBlank ? null : GraphsConfig.getGameData.mutatedSeeds();
+			this.s3 = asBlank ? null : GraphsConfig.getGameData.s3();
 		}
 		// create an object to collect only the relevant data per zone, without fromEntries because old JS
 		this.perZoneData = {};
@@ -1562,7 +1562,9 @@ const GraphsConfig = {
 			customFunction: (portal, item, index, x) => {
 				let universe = portal.universe
 				let hze = (universe == 1 ? portal.u1hze : portal.u2hze);
-				if (!hze) Graphs.portalSaveData[`u${universe} p${portal.portalCount-1}`].currentTime.length - 1;
+				if (!hze) {
+					hze = Graphs.portalSaveData[`u${universe} p${portal.totalPortals-1}`].perZoneData.currentTime.length - 1;
+				}
 				if (hze > 200) hze = 200
 				if (hze < 80) hze = 80
 				let min = 1000 + ((hze - 80) * 13);
