@@ -784,7 +784,7 @@ const Graphs = {
 		this.baseGraphTitle = this.graphTitle;
 
 		// create an object to pass to Highcharts.Chart
-		this.createHighChartsObj = function () {
+		this._createHighChartsObj = function () {
 			return {
 				chart: {
 					renderTo: "graph",
@@ -895,13 +895,52 @@ const Graphs = {
 			Graphs.ChartArea.chart = new Highcharts.Chart(HighchartsObj);
 			Graphs.ChartArea.applyRemembered();
 		}
+
+		// Data parsing for line graphs
+		this._parseDataVar = function (portal, item, activeToggles) {
+			var cleanData = [];
+			var xprev = 0;
+			var maxS3 = Math.max(...Object.values(Graphs.portalSaveData).map((portal) => portal.s3).filter((s3) => s3));
+			for (const zone in portal.perZoneData[item]) {
+				var x = portal.perZoneData[item][zone];
+				var time = portal.perZoneData.currentTime[zone];
+				if (time < 0) continue; // Skip data on game bug, whee 
+				if (typeof this.customFunction === "function") {
+					x = this.customFunction(portal, zone);
+					if (x < 0) x = null;
+				}
+				// TOGGLES
+				// handle toggles that replace whole data vars first
+				for (var toggle of activeToggles) {
+					if (["perZone", "perHr"].includes(toggle)) continue;
+					try { x = GraphsConfig.toggledGraphs[toggle].customFunction(portal, item, zone, x, time, maxS3, xprev); }
+					catch (e) {
+						x = 0;
+						Graphs.debugMsg(`Error graphing data on: ${item} ${toggle}, ${e.message}`)
+					}
+				}
+				// handle special time and X modifying toggles
+				originalx = x // save before modifiers for perZone use
+				if (activeToggles.includes("perZone")) {  // must always be first 
+					[x, time] = GraphsConfig.toggledGraphs.perZone.customFunction(portal, item, zone, x, false, false, xprev);
+				}
+				if (activeToggles.includes("perHr")) {  // must always be first 
+					x = GraphsConfig.toggledGraphs.perHr.customFunction(portal, item, zone, x, time, maxS3, xprev);
+				}
+				xprev = originalx;
+				//if (this.useAccumulator) { x += last(cleanData) !== undefined ? last(cleanData)[1] : 0; }
+				if (this.typeCheck && typeof x != this.typeCheck) x = null;
+				cleanData.push([Number(zone), x]) // highcharts expects number, number, not str, number
+			}
+			return cleanData
+		}
+		
 		// prepares data series for Highcharts, and optionally transforms it with toggled options, customFunction and useAccumulator
 		this.lineGraph = function () {
-			var highChartsObj = this.createHighChartsObj() // make default object, to be customized as needed
+			var highChartsObj = this._createHighChartsObj() // make default object, to be customized as needed
 			var item = this.dataVar;
 			this.graphData = [];
 			this.useAccumulator = false; // HACKS ( only one set of graphs uses an accumulator and it's on a toggle )
-			var maxS3 = Math.max(...Object.values(Graphs.portalSaveData).map((portal) => portal.s3).filter((s3) => s3));
 			var activeToggles = [];
 			if (this.toggles) {
 				// Modify the chart area based on the toggles active
@@ -917,43 +956,10 @@ const Graphs = {
 			for (const portal of Object.values(Graphs.portalSaveData).reverse()) {
 				if (!activeDataVars.some(dvar => dvar in portal.perZoneData)) continue; // ignore completely blank
 				if (portal.universe != Graphs.Settings.universeSelection) continue; // ignore inactive universe
-				var cleanData = [];
-				var xprev = 0;
-				// parse the requested datavar
-				for (const zone in portal.perZoneData[item]) {
-					var x = portal.perZoneData[item][zone];
-					var time = portal.perZoneData.currentTime[zone];
-					if (typeof this.customFunction === "function") {
-						x = this.customFunction(portal, zone);
-						if (x < 0) x = null;
-					}
-					// TOGGLES
-					// handle toggles that replace whole data vars first
-					for (var toggle of activeToggles) {
-						if (["perZone", "perHr"].includes(toggle)) continue;
-						try { x = GraphsConfig.toggledGraphs[toggle].customFunction(portal, item, zone, x, time, maxS3, xprev); }
-						catch (e) {
-							x = 0;
-							Graphs.debugMsg(`Error graphing data on: ${item} ${toggle}, ${e.message}`)
-						}
-					}
-					// handle special time and X modifying toggles
-					originalx = x // save before modifiers for perZone use
-					if (activeToggles.includes("perZone")) {  // must always be first 
-						[x, time] = GraphsConfig.toggledGraphs.perZone.customFunction(portal, item, zone, x, false, false, xprev);
-					}
-					if (activeToggles.includes("perHr")) {  // must always be first 
-						x = GraphsConfig.toggledGraphs.perHr.customFunction(portal, item, zone, x, time, maxS3, xprev);
-					}
-					xprev = originalx;
-					//if (this.useAccumulator) { x += last(cleanData) !== undefined ? last(cleanData)[1] : 0; }
-					if (this.typeCheck && typeof x != this.typeCheck) x = null;
-					cleanData.push([Number(zone), x]) // highcharts expects number, number, not str, number
-				}
+				var cleanData = this._parseDataVar(portal, item, activeToggles)
 				if (activeToggles.includes("perZone") && ["fluffy", "scruffy"].includes(item)) {
 					cleanData.splice(cleanData.length - 1); // current zone is too erratic to include due to weird order of granting fluffy exp 
 				}
-
 				//check for empty data and discard portal
 				const uniqueData = new Set(cleanData.map(([zone, data]) => { return data }))
 				uniqueData.delete(null); uniqueData.delete(0);
@@ -961,7 +967,6 @@ const Graphs = {
 					Graphs.debugMsg("u" + portal.universe, portal.totalPortals, item, "is blank, not displaying")
 					continue;
 				}
-
 				this.graphData.push({
 					name: `Portal ${portal.totalPortals}: ${portal.challenge}`,
 					data: cleanData,
@@ -975,10 +980,7 @@ const Graphs = {
 							} else {
 								e.preventDefault();
 								Graphs.ChartArea.toggleNamed(e.target.name)
-							}
-						}
-					}
-				})
+				}}}})
 				// customs 'zooms' 
 				if (["nursery", 'coord'].includes(item)) {
 					let data = cleanData.map(([zone, data]) => {return data})
@@ -996,7 +998,7 @@ const Graphs = {
 		}
 		// prepares multi-column data series from per-portal data.
 		this.columnGraph = function () {
-			var highChartsObj = this.createHighChartsObj() // make default object, to be customized as needed
+			var highChartsObj = this._createHighChartsObj() // make default object, to be customized as needed
 			highChartsObj.xAxis.title.text = "Portal"
 			highChartsObj.xAxis.floor = 0;
 			highChartsObj.plotOptions.series = { groupPadding: .2, pointPadding: 0, animation: false, borderColor: "black" }
@@ -1086,12 +1088,12 @@ const Graphs = {
 		}
 		// create an object to collect only the relevant data per zone, without fromEntries because old JS
 		this.perZoneData = {};
-		var perZoneItems = GraphsConfig.graphList.filter((graph) =>
+		var _perZoneItems = GraphsConfig.graphList.filter((graph) =>
 			(graph.universe == this.universe || !graph.universe) // only save data relevant to the current universe
 			&& graph.conditional() && graph.dataVar) // and for relevant challenges, with datavars 
 			.map((graph) => graph.dataVar)
 			.concat(["currentTime", "mapCount", "timeOnMap", "mapHeRn", "warpPerGiga"]); // always graph time vars
-		perZoneItems.forEach((name) => this.perZoneData[name] = []);
+		_perZoneItems.forEach((name) => this.perZoneData[name] = []);
 
 		// update per zone data and special totals
 		this.update = function () { // check source of the update
