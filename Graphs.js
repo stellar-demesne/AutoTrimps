@@ -532,6 +532,10 @@ const Graphs = {
 				for (const universe of universes) {
 					var style = "none"
 					for (portal of Object.values(Graphs.portalSaveData)) {
+						if (["Bonfires"].includes(graph.selectorText)) { // depreciated graphs
+							style = "none"
+							break;
+						}
 						if (portal.perZoneData[graph.dataVar] && portal.universe === universe  // has collected data, in the right universe
 							&& new Set(portal.perZoneData[graph.dataVar].filter(x => x === 0 || x)).size > 1) { // and there is nonzero, variable data
 							style = ""
@@ -912,7 +916,7 @@ const Graphs = {
 				// TOGGLES
 				// handle toggles that replace whole data vars first
 				for (var toggle of activeToggles) {
-					if (["perZone", "perHr"].includes(toggle)) continue;
+					if (["perZone", "perHr", "bonfires"].includes(toggle)) continue;
 					try { x = GraphsConfig.toggledGraphs[toggle].customFunction(portal, item, zone, x, time, maxS3, xprev); }
 					catch (e) {
 						x = 0;
@@ -921,7 +925,7 @@ const Graphs = {
 				}
 				// handle special time and X modifying toggles
 				originalx = x // save before modifiers for perZone use
-				if (activeToggles.includes("perZone")) {  // must always be first 
+				if (activeToggles.includes("perZone") || activeToggles.includes("bonfires")) {  // must always be first 
 					[x, time] = GraphsConfig.toggledGraphs.perZone.customFunction(portal, item, zone, x, false, false, xprev);
 				}
 				if (activeToggles.includes("perHr")) {  // must always be first 
@@ -1352,11 +1356,13 @@ const GraphsConfig = {
 			xminFloor: 31,
 		}),
 		new Graphs.Graph("bonfires", 2, "Bonfires", {
-			graphTitle: "Active Bonfires",
-			conditional: () => { return GraphsConfig.getGameData.challengeActive() === "Hypothermia" }
+			graphTitle: "Active Bonfires (Depreciated, use toggle on Hypothermia Graph)", // return GraphsConfig.getGameData.challengeActive() === "Hypothermia"
+			conditional: () => { false }
 		}),
-		new Graphs.Graph("embers", 2, "Embers", {
-			conditional: () => { return GraphsConfig.getGameData.challengeActive() === "Hypothermia" }
+		new Graphs.Graph("embers", 2, "Hypothermia", {
+			conditional: () => { return GraphsConfig.getGameData.challengeActive() === "Hypothermia" },
+			graphTitle: "Embers",
+			toggles: ["bonfires"]
 		}),
 		new Graphs.Graph("cruffys", 2, "Cruffys", {
 			conditional: () => { return false }, // getGameData.challengeActive() === "Nurture"
@@ -1476,6 +1482,27 @@ const GraphsConfig = {
 				highChartsObj.title.text += " each Zone"
 				graph.useAccumulator = false // HACKS this might be incredibly stupid, find out later when you use this option for a different case!
 			},
+			customFunction: (portal, item, index, x, time, maxS3, xprev) => {
+				// discard diffs when there isn't data before or on the zone
+				if (index == 1) return [x, portal.perZoneData.currentTime[index]]; // short circuit for zone 1 which has no diff
+				var xdiff = null;
+				var timediff = null
+				if (x !== null && xprev !== null) {
+					xdiff = x - xprev;
+				}
+				if (portal.perZoneData.currentTime[index] !== null && portal.perZoneData.currentTime[index - 1] !== null) {
+					timediff = portal.perZoneData.currentTime[index] - portal.perZoneData.currentTime[index - 1]
+				}
+				return [xdiff, timediff];
+			}
+		},
+		bonfires: {
+			// duplicate perZone 
+			graphMods: (graph, highChartsObj) => {
+				highChartsObj.title.text = "Active Bonfires"
+				graph.useAccumulator = false
+			},
+			// can't just reference the original because scopes are awful why is JS so bad at this
 			customFunction: (portal, item, index, x, time, maxS3, xprev) => {
 				// discard diffs when there isn't data before or on the zone
 				if (index == 1) return [x, portal.perZoneData.currentTime[index]]; // short circuit for zone 1 which has no diff
