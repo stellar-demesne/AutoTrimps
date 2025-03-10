@@ -1595,7 +1595,7 @@ const GraphsConfig = {
 				if (hze > 200) hze = 200
 				if (hze < 80) hze = 80
 				let min = 1000 + ((hze - 80) * 13);
-				return x / min * 2560 // 200 hze value
+				return x * min / 2560 // 200 hze value
 			}
 		}
 	},
